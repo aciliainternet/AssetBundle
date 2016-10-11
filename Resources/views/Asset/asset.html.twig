@@ -1,0 +1,60 @@
+<div class="form-group">
+    <label for="channel_code" class="col-sm-2 control-label">{{ imageOption.type|title }}</label>
+    <div class="col-sm-2">
+        <label for="input-{{ imageOption.randomId }}">
+            {% if asset %}<a href="#" id="delete-{{ imageOption.randomId }}" class="acilia-asset-delete" title="Delete image" ><i class="fa fa-trash"></i></a>{% endif %}
+            <img class="acilia-image-uploader-placeholder"
+                 id="image-placeholder-{{ imageOption.randomId }}"
+                 data-placement="right" data-toggle="tooltip" data-original-title="Click to upload a new image"
+                 src="{{ assetUrl ?: asset('bundles/aciliaasset/img/missing-image-640x360.png') }}"
+                 data-empty-src="{{ asset('bundles/aciliaasset/img/missing-image-640x360.png') }}"
+                 data-asset="{{ asset ? 'true' : 'false' }}"
+                 width="200"
+            />
+        </label>
+        {% for aspectRatio in imageOption.aspectRatios %}
+        <input type="hidden" name="asset[{{ imageOption.type }}][{{ aspectRatio }}]" class="asset-{{ imageOption.randomId }}" id="asset-{{ imageOption.randomId }}-{{ aspectRatio }}" />
+        {% endfor %}
+    </div>
+    {% block extradata %}<!-- Using Asset Form -->{% endblock %}
+</div>
+
+<div class="modal inmodal fade" id="cropper-modal-{{ imageOption.randomId }}" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title back-change clearfix">
+                            <h5>{{ imageOption.title }}</h5>
+                        </div>
+                        <div class="ibox-content acilia-image-corpper" id="{{ imageOption.randomId }}" data-specs="{{ imageOption.specs|json_encode }}" style="display: none;">
+                            <p></p>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4>Source image</h4>
+                                    <div class="image-crop">
+                                        <img src="" width="500">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Preview for <span id="title-aspect-ratio-{{ imageOption.randomId }}">_</span></h4>
+                                    <div class="img-preview img-preview-sm"></div>
+                                    <br />
+                                    <input type="file" accept="image/*" name="file[{{ imageOption.type }}]" id="input-{{ imageOption.randomId }}" class="hide" />
+                                    <div class="alert alert-danger" style="display: none;">Error: the image selected or the crop selection is too small.</div>
+                                    <em>This image has the following<br/>aspect ratios: {{ imageOption.aspectRatios(':')|join(', ') }}</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" id="cancel-{{ imageOption.randomId }}">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-{{ imageOption.randomId }}" data-base-aspect-ratios="{{ imageOption.aspectRatios|json_encode }}">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>

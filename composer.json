@@ -1,0 +1,22 @@
+{
+    "name": "aciliainternet/asset-bundle",
+    "type": "bundle",
+    "description": "Acilia Asset Bundle",
+    "keywords": ["bundle"],
+    "homepage": "https://github.com/aciliainternet/AssetBundle",
+    "authors": [
+        {
+            "name": "Acilia Internet",
+            "homepage": "http://acilia.es"
+        }
+    ],
+    "require": {
+        "php":                        ">=5.3.3",
+        "symfony/framework-bundle":   ">=2.7.0",
+        "intervention/image":         "^2.3"
+    },
+    "autoload": {
+        "psr-0": { "Acilia\\Bundle\\AssetBundle": "" }
+    },
+    "target-dir": "Acilia/Bundle/AssetBundle"
+}
