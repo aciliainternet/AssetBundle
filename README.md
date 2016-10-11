@@ -35,7 +35,7 @@ public function registerBundles()
 php bin/console assets:install web/backend/
 ```
 
-### Link resources on your templage
+### Link resources on your template
 
 ```php
 {% stylesheets
