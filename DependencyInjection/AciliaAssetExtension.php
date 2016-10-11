@@ -39,6 +39,7 @@ class AciliaAssetExtension extends Extension
         $images = Yaml::parse(file_get_contents($config['assets_images']));
         $container->setParameter('acilia_asset.assets_images', $images);
         $container->setParameter('acilia_asset.assets_dir', $config['assets_dir']);
+        $container->setParameter('acilia_asset.assets_public', $config['assets_public']);
         $container->setParameter('acilia_asset.assets_domain', $config['assets_domain']);
 
     }

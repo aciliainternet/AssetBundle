@@ -85,7 +85,7 @@ class ImageService extends AbstractImageService
         }
 
         $filename = $this->getAssetFilename($asset, $size);
-        $url = '/' . trim($this->assetsPublic, '/') . $filename;
+        $url = '/' . trim($this->assetsPublic, '/') . '/' . $filename;
 
         return $url;
     }
