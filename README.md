@@ -29,6 +29,31 @@ public function registerBundles()
 }
 ```
 
+### Add assets resources to your public dir
+
+```sh
+php bin/console assets:install web/backend/
+```
+
+### Link resources on your templage
+
+```php
+{% stylesheets
+    'bundles/aciliaasset/css/plugins/cropper/cropper.min.css'
+    filter='cssrewrite' output='css/compiled/app.css' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+{% endstylesheets %}
+
+% javascripts
+    'bundles/aciliaasset/js/plugins/cropper/cropper.min.js'
+    'bundles/aciliaasset/js/cropper.js'
+    'bundles/aciliaasset/js/uploader.js'
+    output='js/compiled/app.js' %}
+    <script src="{{ asset_url }}"></script>
+{% endjavascripts %}
+```
+
+
 <a name="configuration"></a>
 
 ### Configuration example
