@@ -18,7 +18,7 @@ class Asset
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=24, name="asset_type")
+     * @ORM\Column(type="string", length=64, name="asset_type")
      */
     protected $type;
 

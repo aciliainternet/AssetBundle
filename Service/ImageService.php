@@ -6,6 +6,7 @@ use Acilia\Bundle\AssetBundle\Library\Image\ImageService as AbstractImageService
 use Acilia\Bundle\AssetBundle\Library\Exception\ImageException;
 use Acilia\Bundle\AssetBundle\Library\Image\ImageStream;
 use Acilia\Bundle\AssetBundle\Entity\Asset;
+use Acilia\Bundle\AssetBundle\Library\AssetResponse;
 use Doctrine\ORM\EntityManager;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Exception\NotReadableException;
@@ -92,14 +93,19 @@ class ImageService extends AbstractImageService
 
     public function handleRequest(Request $request, $entity)
     {
+        // create the response object
+        $assetResponse = new AssetResponse();
         if (! $request->request->has('asset')) {
-            return true;
+            $assetResponse->setStatus(true);
+
+            return $assetResponse;
         }
 
         $assets = $request->request->get('asset');
         try {
             $this->em->beginTransaction();
 
+            $asset = null;
             foreach ($assets as $type => $aspectRatios) {
                 $imageOption = $this->getOption($this->getEntityCode($entity), $type);
 
@@ -138,7 +144,6 @@ class ImageService extends AbstractImageService
                     }
 
                     if ($streamsFound) {
-
                         // Associate Asset
                         $reflex = new ReflectionMethod(get_class($entity), $imageOption->getSetter());
                         $reflex->invoke($entity, $asset);
@@ -149,20 +154,26 @@ class ImageService extends AbstractImageService
                 }
             }
 
+            $assetResponse->setStatus(true);
+            $assetResponse->setAsset($asset);
+
             $this->em->commit();
         } catch (ImageException $e) {
             $this->em->rollback();
             $this->logger->error(sprintf('Error generating the image from the stream , ImageException: %s', $e->getMessage()));
 
-            return false;
+            $assetResponse->setStatus(false);
+            $assetResponse->setErrorMessage(sprintf('Error generating the image from the stream , ImageException: %s', $e->getMessage()));
+
         } catch (Exception $e) {
             $this->em->rollback();
             $this->logger->error(sprintf('Error saving the image, Exception: %s', $e->getMessage()));
 
-            return false;
+            $assetResponse->setStatus(false);
+            $assetResponse->setErrorMessage(sprintf('Error saving the image, Exception: %s', $e->getMessage()));
         }
 
-        return true;
+        return $assetResponse;
     }
 
     public function createAsset($data, $entity)
