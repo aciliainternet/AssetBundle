@@ -238,7 +238,6 @@ class ImageService extends AbstractImageService
 
         try {
             $image = $this->getImageManager()->make($originalFileName)->resize($rendition['w'], $rendition['h'], function ($ctr) { $ctr->aspectRatio(); });
-        );
             $image->interlace(false);
             $image->save($renditionFileName, $quality);
         } catch (NotReadableException $e) {
