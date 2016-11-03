@@ -237,7 +237,8 @@ class ImageService extends AbstractImageService
         $renditionFileName = sprintf('%s/%u.%s.%s', $directory, $asset->getId(), $rendition['n'], $asset->getExtension());
 
         try {
-            $image = $this->getImageManager()->make($originalFileName)->resize($rendition['w'], $rendition['h']);
+            $image = $this->getImageManager()->make($originalFileName)->resize($rendition['w'], $rendition['h'], function ($ctr) { $ctr->aspectRatio(); });
+        );
             $image->interlace(false);
             $image->save($renditionFileName, $quality);
         } catch (NotReadableException $e) {
