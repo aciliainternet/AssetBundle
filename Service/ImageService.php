@@ -79,8 +79,12 @@ class ImageService extends AbstractImageService
         try {
             $imageOption = $this->getOption($asset);
             $sizes = $imageOption->getRendition($rendition);
-
-            $size = isset($sizes[$size]) ? $sizes[$size] : $size;
+            
+            if (is_array($sizes)) {
+                $size = isset($sizes[$size]) ? $sizes[$size] : $size;
+            } else {
+                $size = $imageOption->getFirstSize();
+            }
         } catch (Exception $e) {
             $size = $rendition;
         }
