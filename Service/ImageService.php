@@ -221,6 +221,21 @@ class ImageService extends AbstractImageService
         }
     }
 
+    /**
+     * @param $entity
+     * @return array
+     *
+     * Returns an array with the profiles defined for the entity
+     */
+    public function getProfiles($entity)
+    {
+        $entity = $this->getEntityCode($entity);
+        if (isset($this->imageOptions['entities'][$entity])) {
+            return $this->imageOptions['entities'][$entity];
+        }
+        return [];
+    }
+
     protected function saveOriginal(Asset $asset, $stream, $aspectRatio)
     {
         $directory = $this->createDirectory($asset);
