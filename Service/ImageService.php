@@ -118,12 +118,7 @@ class ImageService extends AbstractImageService
                     $reflex->invoke($entity, null);
                     $this->em->flush($entity);
                 } else {
-                    $asset = new Asset();
-                    $asset->setType($imageOption->getAssetType())
-                        ->setExtension('jpg');
-                    $this->em->persist($asset);
-                    $this->em->flush($asset);
-
+                    $asset = false;
                     $streamsFound = false;
 
                     foreach ($aspectRatios as $aspectRatio => $stream) {
@@ -134,9 +129,14 @@ class ImageService extends AbstractImageService
                         $streamsFound = true;
                         $imageStream = ImageStream::getInstanceFromStream($stream);
 
-                        // persist the asset extension
-                        $asset->setExtension($imageStream->getType());
-                        $this->em->flush($asset);
+                        // Create the Asset if it's not created already
+                        if (!$asset instanceof Asset) {
+                            $asset = new Asset();
+                            $asset->setType($imageOption->getAssetType())
+                                ->setExtension($imageStream->getType());
+                            $this->em->persist($asset);
+                            $this->em->flush($asset);
+                        }
 
                         // Store Original
                         $this->saveOriginal($asset, $imageStream->getContent(), $aspectRatio);
