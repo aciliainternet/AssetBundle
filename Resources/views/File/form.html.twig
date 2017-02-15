@@ -1,0 +1,10 @@
+<div class="form-group">
+    <label for="channel_code" class="col-sm-2 control-label">{{ fileOption.title|title }}</label>
+    <div class="col-sm-2">
+        <label for="input-{{ fileOption.randomId }}">
+            {# % if asset %}<a href="#" id="delete-{{ fileOption.randomId }}" class="acilia-asset-delete" title="Delete image" ><i class="fa fa-trash"></i></a>{% endif % #}
+        </label>
+        <input type="file" name="file[{{ fileOption.type }}]" class="asset-{{ fileOption.randomId }}" id="asset-{{ fileOption.randomId }}" />
+    </div>
+    {% block extradata %}<!-- Using Asset Form -->{% endblock %}
+</div>

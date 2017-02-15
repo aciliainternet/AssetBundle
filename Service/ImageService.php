@@ -18,7 +18,6 @@ use Exception;
 
 class ImageService extends AbstractImageService
 {
-
     protected $em;
     protected $logger;
     protected $imageOptions;
@@ -153,7 +152,6 @@ class ImageService extends AbstractImageService
                         $reflex->invoke($entity, $asset);
 
                         $this->em->flush($entity);
-                        $this->em->flush($asset);
                     }
                 }
             }
@@ -168,7 +166,6 @@ class ImageService extends AbstractImageService
 
             $assetResponse->setStatus(false);
             $assetResponse->setErrorMessage(sprintf('Error generating the image from the stream , ImageException: %s', $e->getMessage()));
-
         } catch (Exception $e) {
             $this->em->rollback();
             $this->logger->error(sprintf('Error saving the image, Exception: %s', $e->getMessage()));
