@@ -23,7 +23,7 @@ class Asset
     protected $type;
 
     /**
-     * @ORM\Column(type="string", length=3, name="asset_extension")
+     * @ORM\Column(type="string", length=4, name="asset_extension")
      */
     protected $extension;
 

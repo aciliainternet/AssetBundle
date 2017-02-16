@@ -29,6 +29,11 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('assets_dir')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('assets_public')->defaultValue('/media')->end()
                 ->scalarNode('assets_domain')->isRequired()->cannotBeEmpty()->end()
+
+                ->scalarNode('assets_files')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('assets_files_dir')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('assets_files_public')->defaultValue('/files')->end()
+                ->scalarNode('assets_files_domain')->isRequired()->cannotBeEmpty()->end()
             ->end();
 
         return $treeBuilder;
