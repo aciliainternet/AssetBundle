@@ -83,6 +83,10 @@ class FileService extends AbstractFileService
 
             /** @var UploadedFile $fileData  */
             foreach ($assets as $type => $fileData) {
+                if ($fileData == null) {
+                    continue;
+                }
+                
                 $fileOption = $this->getOption($this->getEntityCode($entity), $type);
 
                 /**
