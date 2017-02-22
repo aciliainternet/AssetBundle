@@ -110,6 +110,10 @@ class ImageService extends AbstractImageService
 
             $asset = null;
             foreach ($assets as $type => $aspectRatios) {
+                if ($aspectRatios == null) {
+                    continue;
+                }
+
                 $imageOption = $this->getOption($this->getEntityCode($entity), $type);
 
                 if (in_array('::delete::', $aspectRatios)) {
@@ -154,10 +158,12 @@ class ImageService extends AbstractImageService
                         $this->em->flush($entity);
                     }
                 }
+
+                $assetResponse->addAsset($type, $asset);
             }
 
             $assetResponse->setStatus(true);
-            $assetResponse->setAsset($asset);
+
 
             $this->em->commit();
         } catch (ImageException $e) {

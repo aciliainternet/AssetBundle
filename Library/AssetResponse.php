@@ -2,11 +2,18 @@
 
 namespace Acilia\Bundle\AssetBundle\Library;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class AssetResponse
 {
     protected $status;
     protected $errorMessage;
-    protected $asset;
+    protected $assets;
+
+    public function __construct()
+    {
+        $this->assets = new ArrayCollection();
+    }
 
     public function setStatus($status)
     {
@@ -28,13 +35,24 @@ class AssetResponse
         return $this->errorMessage;
     }
 
-    public function setAsset($asset)
+    public function addAsset($key, $asset)
     {
-        $this->asset = $asset;
+        $this->assets[$key] = $asset;
+
+        return $this;
     }
 
-    public function getAsset()
+    public function getAssets()
     {
-        return $this->asset;
+        return $this->assets;
+    }
+
+    public function getAsset($key)
+    {
+        if (isset($this->assets[$key])) {
+            return $this->assets[$key];
+        }
+
+        return null;
     }
 }

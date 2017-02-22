@@ -136,10 +136,11 @@ class FileService extends AbstractFileService
                     $wrapper->setAssetFile($asset);
                     $this->em->flush($wrapper);
                 }
+
+                $assetResponse->addAsset($type, $asset);
             }
 
             $assetResponse->setStatus(true);
-            $assetResponse->setAsset($asset);
 
             $this->em->commit();
         } catch (FileException $e) {
