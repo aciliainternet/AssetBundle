@@ -7,11 +7,19 @@ Cropper.reconfigure = function($image, id, aspectRatio, options) {
     Cropper.currentOptions = options;
 
     var aspectRatios = jQuery.parseJSON($('#save-' + id).attr('data-aspect-ratios'));
+    var buttonText = '';
     if (aspectRatios.length > 0) {
-        $('#save-' + id).html('Next');
+        buttonText = 'Next';
+        if ($('#save-' + id).attr('data-text-next') != '') {
+            buttonText = $('#save-' + id).attr('data-text-next');
+        }
     } else {
-        $('#save-' + id).html('Confirm');
+        buttonText = 'Save';
+        if ($('#save-' + id).attr('data-text-save') != '') {
+            buttonText = $('#save-' + id).attr('data-text-save');
+        }
     }
+    $('#save-' + id).html(buttonText);
 
     if (options.aspectRatio >= 1) {
         jQuery('#' + id + ' .img-preview').css('width', '250px');
