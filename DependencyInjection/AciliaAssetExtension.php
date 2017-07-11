@@ -43,7 +43,7 @@ class AciliaAssetExtension extends Extension
         $container->setParameter('acilia_asset.assets_domain', $config['assets_domain']);
 
         // Load Files mapping
-        $files = (isset($config['assets_files']) && file_exists($config['assets_files'])) ? Yaml::parse(file_get_contents($config['assets_files'])) : '';;
+        $files = ($config['assets_files'] !== false) ? Yaml::parse(file_get_contents($config['assets_files'])) : false;
         $container->setParameter('acilia_asset.assets_files', $files);
         $container->setParameter('acilia_asset.assets_files_dir', $config['assets_files_dir']);
         $container->setParameter('acilia_asset.assets_files_public', $config['assets_files_public']);
