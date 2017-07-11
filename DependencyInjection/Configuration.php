@@ -30,10 +30,10 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('assets_public')->defaultValue('/media')->end()
                 ->scalarNode('assets_domain')->isRequired()->cannotBeEmpty()->end()
 
-                ->scalarNode('assets_files')->isRequired()->cannotBeEmpty()->end()
-                ->scalarNode('assets_files_dir')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('assets_files')->defaultValue(false)->end()
+                ->scalarNode('assets_files_dir')->defaultValue('')->end()
                 ->scalarNode('assets_files_public')->defaultValue('/files')->end()
-                ->scalarNode('assets_files_domain')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('assets_files_domain')->defaultValue('')->end()
             ->end();
 
         return $treeBuilder;
