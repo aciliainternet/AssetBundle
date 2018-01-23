@@ -4,6 +4,7 @@ services:
     acilia.asset.service.image:
         class: Acilia\Bundle\AssetBundle\Service\ImageService
         arguments: ["@doctrine.orm.entity_manager", "@logger", "%acilia_asset.assets_images%", "%acilia_asset.assets_dir%", "%acilia_asset.assets_public%", "%acilia_asset.assets_domain%"]
+        public: true
 
     # File service
     acilia.asset.service.file:
