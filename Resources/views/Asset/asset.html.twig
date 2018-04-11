@@ -12,6 +12,9 @@
                  width="200"
             />
         </label>
+        {% if imageOption.preserveOriginal is defined and imageOption.preserveOriginal %}
+            <input type="hidden" name="asset[{{ imageOption.type }}][original]" id="asset-original-{{ imageOption.randomId }}" />
+        {% endif %}
         {% for aspectRatio in imageOption.aspectRatios %}
         <input type="hidden" name="asset[{{ imageOption.type }}][{{ aspectRatio }}]" class="asset-{{ imageOption.randomId }}" id="asset-{{ imageOption.randomId }}-{{ aspectRatio }}" />
         {% endfor %}

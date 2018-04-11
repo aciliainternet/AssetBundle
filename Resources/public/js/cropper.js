@@ -114,6 +114,10 @@ Cropper.init = function(id) {
                     var options = jQuery.parseJSON(jQuery('#' + id).attr('data-specs'));
                     $result = this.result;
 
+                    if ($("#asset-original-" + id).length) {
+                        $("#asset-original-" + id).attr('value', $result);
+                    }
+
                     $('#cropper-modal-' + id).off();
                     $('#cropper-modal-' + id).on('shown.bs.modal', function(event) {
                         var $image = $('#' + id + ' .image-crop > img');
