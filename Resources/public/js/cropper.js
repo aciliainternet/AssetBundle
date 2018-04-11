@@ -114,8 +114,8 @@ Cropper.init = function(id) {
                     var options = jQuery.parseJSON(jQuery('#' + id).attr('data-specs'));
                     $result = this.result;
 
-                    if ($("#asset-original-" + id).length) {
-                        $("#asset-original-" + id).attr('value', $result);
+                    if ($("#asset-master-" + id).length) {
+                        $("#asset-master-" + id).attr('value', $result);
                     }
 
                     $('#cropper-modal-' + id).off();
