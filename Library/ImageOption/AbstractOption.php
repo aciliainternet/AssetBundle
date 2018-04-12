@@ -29,6 +29,7 @@ abstract class AbstractOption
         $this->retina = isset($options['retina']) ? $options['retina'] : false;
         $this->quality = isset($options['quality']) ? $options['quality'] : self::DEFAULT_QUALITY;
         $this->assetsPerDirectory = isset($options['assetsPerDirectory']) ? $options['assetsPerDirectory'] : false;
+        $this->preserveOriginal = isset($options['preserveOriginal']) ? $options['preserveOriginal'] : false;
     }
 
     abstract public function getRendition($rendition);
