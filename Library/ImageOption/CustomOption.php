@@ -24,6 +24,7 @@ class CustomOption extends AbstractOption
         $this->retina = false;
         $this->minWidths = 0;
         $this->minHeights = 0;
+        $this->preserveOriginal = false;
 
         if (isset($options['restrictions'])) {
             if (isset($options['restrictions']['min-width'])) {
@@ -35,6 +36,10 @@ class CustomOption extends AbstractOption
             if (isset($options['restrictions']['thumb-width'])) {
                 $this->thumbWidth = $options['restrictions']['thumb-width'];
             }
+        }
+
+        if (isset($options['preserveOriginal'])) {
+            $this->preserveOriginal = $options['preserveOriginal'];
         }
     }
 
