@@ -3,33 +3,34 @@
 namespace Acilia\Bundle\AssetBundle\Controller;
 
 use Acilia\Bundle\AssetBundle\Entity\Asset;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Acilia\Bundle\AssetBundle\Service\ImageService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetController extends Controller
+class AssetController extends AbstractController
 {
-    public function formAction(Request $request, $entity, $type)
+    public function __construct(ImageService $service)
+    {
+        $this->service = $service;
+    }
+
+    protected function getService(): ImageService
+    {
+        return $this->service;
+    }
+
+    public function form(Asset $entity, ?string $type): Response
     {
         $imageService = $this->getService();
         $imageOption = $imageService->getOption($entity, $type);
         $asset = $imageService->getAssetFromEntity($entity, $type);
 
-        $assetUrl = null;
-        if ($asset instanceof Asset) {
-            $assetUrl = $imageService->getUrl($asset);
-        }
+        $assetUrl = ($asset instanceof Asset) ? $imageService->getUrl($asset) : null;
 
         return $this->render('AciliaAssetBundle:Asset:asset.html.twig', [
-            'asset'       => $asset,
-            'assetUrl'    => $assetUrl,
+            'asset' => $asset,
+            'assetUrl' => $assetUrl,
             'imageOption' => $imageOption,
         ]);
-    }
-
-    protected function getService()
-    {
-        return $this->get('acilia.asset.service.image');
     }
 }

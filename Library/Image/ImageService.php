@@ -6,23 +6,17 @@ use Acilia\Bundle\AssetBundle\Library\ImageOption\AbstractOption;
 use Acilia\Bundle\AssetBundle\Library\ImageOption\RenditionOption;
 use Acilia\Bundle\AssetBundle\Library\ImageOption\CustomOption;
 use Acilia\Bundle\AssetBundle\Entity\Asset;
-use Exception;
 
 abstract class ImageService
 {
-    protected $imageOptions;
+    protected array $imageOptions;
 
-    public function __construct($imageOptions)
+    public function __construct(array $imageOptions)
     {
         $this->imageOptions = $imageOptions;
     }
 
-    /**
-     * @param Asset|string $entity
-     *
-     * @return mixed|string
-     */
-    protected function getEntityCode($entity)
+    protected function getEntityCode($entity): string
     {
         if (is_object($entity)) {
             $entity = get_class($entity);
@@ -34,15 +28,7 @@ abstract class ImageService
         return $entity;
     }
 
-    /**
-     * @param Asset|string $entity
-     * @param string $type
-     *
-     * @return AbstractOption
-     *
-     * @throws Exception
-     */
-    public function getOption($entity, $type = null)
+    public function getOption($entity, ?string $type = null): AbstractOption
     {
         if ($entity instanceof Asset) {
             list($entity, $type) = explode('-', $entity->getType(), 2);
@@ -50,11 +36,11 @@ abstract class ImageService
 
         $entity = $this->getEntityCode($entity);
         if (!isset($this->imageOptions['entities'][$entity])) {
-            throw new Exception(sprintf('Entity %s does not exists.', $entity));
+            throw new \Exception(sprintf('Entity %s does not exists.', $entity));
         }
 
         if (!isset($this->imageOptions['entities'][$entity][$type])) {
-            throw new Exception(sprintf('Type %s in entity %s does not exists.', $type, $entity));
+            throw new \Exception(sprintf('Type %s in entity %s does not exists.', $type, $entity));
         }
 
         $options = $this->imageOptions['entities'][$entity][$type];
@@ -67,12 +53,7 @@ abstract class ImageService
         return $imageOption;
     }
 
-    /**
-     * @param Asset $asset
-     *
-     * @return string
-     */
-    protected function getBaseDirectory(Asset $asset)
+    protected function getBaseDirectory(Asset $asset): string
     {
         $options = $this->getOption($asset, $asset->getType());
 
@@ -85,27 +66,24 @@ abstract class ImageService
         return $directory;
     }
 
-    /**
-     * @param Asset $asset
-     * @param string  $size
-     * @param bool $retina
-     *
-     * @throws Exception
-     *
-     * @return string
-     */
-    public function getAssetFilename(Asset $asset, $size = null, $retina = false)
+    public function getAssetFilename(Asset $asset, ?string $size = null, bool $retina = false): string
     {
         $imageOption = $this->getOption($asset);
-        if ($size === null) {
-            $size = $imageOption->getFirstSize();
+        if (null === $size) {
+            $size = ($imageOption->getFirstSize() !== null) ? $imageOption->getFirstSize() : '';
         }
 
         if ($retina === true) {
             $size .= '@2x';
         }
 
-        $filename = sprintf('%s/%u.%s.%s', $this->getBaseDirectory($asset), $asset->getId(), $size, $asset->getExtension());
+        $filename = sprintf(
+            '%s/%u.%s.%s',
+            $this->getBaseDirectory($asset),
+            $asset->getId(),
+            $size,
+            $asset->getExtension()
+        );
 
         return $filename;
     }

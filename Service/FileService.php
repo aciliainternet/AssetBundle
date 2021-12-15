@@ -3,62 +3,53 @@
 namespace Acilia\Bundle\AssetBundle\Service;
 
 use Acilia\Bundle\AssetBundle\Library\File\FileService as AbstractFileService;
-use Acilia\Bundle\AssetBundle\Library\File\FileOption;
 use Acilia\Bundle\AssetBundle\Library\Exception\FileException;
 use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 use Acilia\Bundle\AssetBundle\Library\AssetResponse;
 use Acilia\Bundle\AssetBundle\Library\File\FileWrapperInterface;
 use Doctrine\ORM\EntityManager;
-use Intervention\Image\Exception\NotReadableException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionMethod;
-use Exception;
 
 class FileService extends AbstractFileService
 {
-    protected $em;
-    protected $logger;
-    protected $fileOptions;
-    protected $fileDirectory;
-    protected $filePublic;
-    protected $fileDomain;
-    protected $error;
+    protected EntityManager $em;
+    protected LoggerInterface $logger;
+    protected ParameterBagInterface $params;
+    protected array $fileOptions;
+    protected string $fileDirectory;
+    protected string $filePublic;
+    protected string $fileDomain;
 
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger, $fileOptions, $fileDirectory, $filePublic, $fileDomain)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        LoggerInterface $logger,
+        ParameterBagInterface $params,
+    ) {
         $this->em = $entityManager;
         $this->logger = $logger;
-        $this->fileOptions = $fileOptions;
-        $this->fileDirectory = $fileDirectory;
-        $this->filePublic = $filePublic;
-        $this->fileDomain = $fileDomain;
+        $this->params = $params;
+        $this->fileOptions = $this->params->get('acilia_asset.assets_files');
+        $this->fileDirectory = $this->params->get('acilia_asset.assets_files_dir');
+        $this->filePublic = $this->params->get('acilia_asset.assets_files_public');
+        $this->fileDomain = $this->params->get('acilia_asset.assets_files_domain');
     }
 
-    /**
-     * @param $entity
-     * @param $type
-     * @return mixed|null
-     */
-    public function getAssetFromEntity($entity, $type)
+    public function getAssetFromEntity($entity, string $type): ?AssetFile
     {
         $asset = null;
         if (is_object($entity)) {
             $fileOptions = $this->getOption($entity, $type);
-            $reflex = new ReflectionMethod(get_class($entity), $fileOptions->getGetter());
+            $reflex = new \ReflectionMethod(get_class($entity), $fileOptions->getGetter());
             $asset = $reflex->invoke($entity);
         }
 
         return $asset;
     }
 
-    /**
-     * @param AssetFile $asset
-     *
-     * @return string
-     */
-    public function getUrl(AssetFile $asset)
+    public function getUrl(AssetFile $asset): string
     {
         $filename = $this->getAssetFilename($asset);
         $url = '/' . trim($this->filePublic, '/') . '/' . $filename;
@@ -66,7 +57,7 @@ class FileService extends AbstractFileService
         return $url;
     }
 
-    public function handleRequest(Request $request, $entity)
+    public function handleRequest(Request $request, $entity): AssetResponse
     {
         // create the response object
         $assetResponse = new AssetResponse();
@@ -86,21 +77,23 @@ class FileService extends AbstractFileService
                 if ($fileData == null) {
                     continue;
                 }
-                
+
                 $fileOption = $this->getOption($this->getEntityCode($entity), $type);
 
                 /**
                  * @todo check delete
-                if (in_array('::delete::', $aspectRatios)) {
-                $reflex = new ReflectionMethod(get_class($entity), $imageOption->getSetter());
-                $reflex->invoke($entity, null);
-                $this->em->flush($entity);
-                }
                  */
+                /*
+                if (in_array('::delete::', $aspectRatios)) {
+                    $reflex = new ReflectionMethod(get_class($entity), $imageOption->getSetter());
+                    $reflex->invoke($entity, null);
+                    $this->em->flush($entity);
+                }
+                */
 
                 try {
                     $fileOption->validate($fileData);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $assetResponse->setStatus(false);
                     $assetResponse->setErrorMessage($e->getMessage());
                     return $assetResponse;
@@ -120,17 +113,17 @@ class FileService extends AbstractFileService
                 $this->save($asset, $fileData);
 
                 // Associate Asset
-                $reflex = new ReflectionMethod(get_class($entity), $fileOption->getSetter());
+                $reflex = new \ReflectionMethod(get_class($entity), $fileOption->getSetter());
                 if (!$fileOption->hasWrapper()) {
                     $reflex->invoke($entity, $asset);
                     $this->em->flush($entity);
 
                 // Associate Wrapper
                 } else {
-                    $reflexGetter = new ReflectionMethod(get_class($entity), $fileOption->getGetter());
+                    $reflexGetter = new \ReflectionMethod(get_class($entity), $fileOption->getGetter());
                     $wrapper = $reflexGetter->invoke($entity);
                     if (!$wrapper instanceof FileWrapperInterface) {
-                        throw new Exception(sprintf('Class "%s" must implement FileWrapperInterface interface', get_class($wrapper)));
+                        throw new \Exception(sprintf('Class "%s" must implement FileWrapperInterface interface', get_class($wrapper)));
                     }
 
                     $wrapper->setAssetFile($asset);
@@ -149,7 +142,7 @@ class FileService extends AbstractFileService
 
             $assetResponse->setStatus(false);
             $assetResponse->setErrorMessage(sprintf('EError saving the file, FileException: %s', $e->getMessage()));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->em->rollback();
             $this->logger->error(sprintf('Error saving the file, Exception: %s', $e->getMessage()));
 
@@ -160,7 +153,7 @@ class FileService extends AbstractFileService
         return $assetResponse;
     }
 
-    public function createAsset($data, $entity)
+    public function createAsset(array $data, $entity): ?AssetFile
     {
         try {
             $fileOption = $this->getOption($this->getEntityCode($entity), $data['type']);
@@ -173,14 +166,14 @@ class FileService extends AbstractFileService
             $this->em->flush($asset);
 
             return $asset;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating the asset file, Exception: %s', $e->getMessage()));
         }
 
         return null;
     }
 
-    protected function save(AssetFile $asset, UploadedFile $fileData)
+    protected function save(AssetFile $asset, UploadedFile $fileData): void
     {
         $directory = $this->createDirectory($asset);
 
@@ -188,11 +181,11 @@ class FileService extends AbstractFileService
         file_put_contents($fileName, file_get_contents($fileData->getPathname()));
 
         if (! file_exists($fileName)) {
-            throw new Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
+            throw new \Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
         }
     }
 
-    protected function createDirectory(AssetFile $asset)
+    protected function createDirectory(AssetFile $asset): string
     {
         $directory = $this->fileDirectory . '/' . $this->getBaseDirectory($asset);
 

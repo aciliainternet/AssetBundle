@@ -1,12 +1,12 @@
 services:
 
     # Image service
-    acilia.asset.service.image:
-        class: Acilia\Bundle\AssetBundle\Service\ImageService
-        arguments: ["@doctrine.orm.entity_manager", "@logger", "%acilia_asset.assets_images%", "%acilia_asset.assets_dir%", "%acilia_asset.assets_public%", "%acilia_asset.assets_domain%"]
-        public: true
+    #acilia.asset.service.image:
+    #    class: Acilia\Bundle\AssetBundle\Service\ImageService
+    #    arguments: ["@doctrine.orm.entity_manager", "@logger", "%acilia_asset.assets_images%", "%acilia_asset.assets_dir%", "%acilia_asset.assets_public%", "%acilia_asset.assets_domain%"]
+    #    public: true
 
     # File service
-    acilia.asset.service.file:
-        class: Acilia\Bundle\AssetBundle\Service\FileService
-        arguments: ["@doctrine.orm.entity_manager", "@logger", "%acilia_asset.assets_files%", "%acilia_asset.assets_files_dir%", "%acilia_asset.assets_files_public%", "%acilia_asset.assets_files_domain%"]
+    #acilia.asset.service.file:
+    #    class: Acilia\Bundle\AssetBundle\Service\FileService
+    #    arguments: ["@doctrine.orm.entity_manager", "@logger", "%acilia_asset.assets_files%", "%acilia_asset.assets_files_dir%", "%acilia_asset.assets_files_public%", "%acilia_asset.assets_files_domain%"]

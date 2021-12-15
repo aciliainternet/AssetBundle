@@ -6,41 +6,42 @@ use Acilia\Bundle\AssetBundle\Library\Image\ImageService as AbstractImageService
 use Acilia\Bundle\AssetBundle\Library\Exception\ImageException;
 use Acilia\Bundle\AssetBundle\Library\Image\ImageStream;
 use Acilia\Bundle\AssetBundle\Entity\Asset;
+use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 use Acilia\Bundle\AssetBundle\Library\AssetResponse;
 use Doctrine\ORM\EntityManager;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Exception\NotReadableException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionMethod;
-use Exception;
 
 class ImageService extends AbstractImageService
 {
-    protected $em;
-    protected $logger;
-    protected $imageOptions;
-    protected $assetsDirectory;
-    protected $assetsPublic;
-    protected $assetDomain;
-    protected $imageManager;
+    protected EntityManager $em;
+    protected LoggerInterface $logger;
+    protected ParameterBagInterface $params;
+    protected array $imageOptions;
+    protected string $assetsDirectory;
+    protected string $assetsPublic;
+    protected string $assetDomain;
+    protected ?ImageManager $imageManager = null;
     protected $error;
 
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger, $imageOptions, $assetsDirectory, $assetsPublic, $assetDomain)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        LoggerInterface $logger,
+        ParameterBagInterface $params
+    ) {
         $this->em = $entityManager;
         $this->logger = $logger;
-        $this->imageOptions = $imageOptions;
-        $this->assetsDirectory = $assetsDirectory;
-        $this->assetsPublic = $assetsPublic;
-        $this->assetDomain = $assetDomain;
+        $this->params = $params;
+        $this->imageOptions = $this->params->get('acilia_asset.assets_images');
+        $this->assetsDirectory = $this->params->get('acilia_asset.assets_dir');
+        $this->assetsPublic = $this->params->get('acilia_asset.assets_public');
+        $this->assetDomain = $this->params->get('acilia_asset.assets_domain');
     }
 
-    /**
-     * @return ImageManager
-     */
-    protected function getImageManager()
+    protected function getImageManager(): ImageManager
     {
         if ($this->imageManager === null) {
             $this->imageManager = new ImageManager(['driver' => 'imagick']);
@@ -49,42 +50,30 @@ class ImageService extends AbstractImageService
         return $this->imageManager;
     }
 
-    /**
-     * @param $entity
-     * @param $type
-     * @return mixed|null
-     */
-    public function getAssetFromEntity($entity, $type)
+    public function getAssetFromEntity($entity, string $type): ?AssetFile
     {
         $asset = null;
         if (is_object($entity)) {
             $imageOptions = $this->getOption($entity, $type);
-            $reflex = new ReflectionMethod(get_class($entity), $imageOptions->getGetter());
+            $reflex = new \ReflectionMethod(get_class($entity), $imageOptions->getGetter());
             $asset = $reflex->invoke($entity);
         }
 
         return $asset;
     }
 
-    /**
-     * @param Asset $asset
-     * @param string $rendition
-     * @param string $size
-     *
-     * @return string
-     */
-    public function getUrl(Asset $asset, $rendition = null, $size = null)
+    public function getUrl(Asset $asset, ?string $rendition = null, string $size = null): string
     {
         try {
             $imageOption = $this->getOption($asset);
             $sizes = $imageOption->getRendition($rendition);
-            
+
             if (is_array($sizes)) {
                 $size = isset($sizes[$size]) ? $sizes[$size] : $size;
             } else {
                 $size = $imageOption->getFirstSize();
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $size = $rendition;
         }
 
@@ -94,7 +83,7 @@ class ImageService extends AbstractImageService
         return $url;
     }
 
-    public function handleRequest(Request $request, $entity)
+    public function handleRequest(Request $request, $entity): AssetResponse
     {
         // create the response object
         $assetResponse = new AssetResponse();
@@ -104,7 +93,7 @@ class ImageService extends AbstractImageService
             return $assetResponse;
         }
 
-        $assets = $request->request->get('asset');
+        $assets = (array) $request->request->get('asset');
         try {
             $this->em->beginTransaction();
 
@@ -117,7 +106,7 @@ class ImageService extends AbstractImageService
                 $imageOption = $this->getOption($this->getEntityCode($entity), $type);
 
                 if (in_array('::delete::', $aspectRatios)) {
-                    $reflex = new ReflectionMethod(get_class($entity), $imageOption->getSetter());
+                    $reflex = new \ReflectionMethod(get_class($entity), $imageOption->getSetter());
                     $reflex->invoke($entity, null);
                     $this->em->flush($entity);
                 } else {
@@ -152,7 +141,7 @@ class ImageService extends AbstractImageService
 
                     if ($streamsFound) {
                         // Associate Asset
-                        $reflex = new ReflectionMethod(get_class($entity), $imageOption->getSetter());
+                        $reflex = new \ReflectionMethod(get_class($entity), $imageOption->getSetter());
                         $reflex->invoke($entity, $asset);
 
                         $this->em->flush($entity);
@@ -164,7 +153,6 @@ class ImageService extends AbstractImageService
 
             $assetResponse->setStatus(true);
 
-
             $this->em->commit();
         } catch (ImageException $e) {
             $this->em->rollback();
@@ -172,7 +160,7 @@ class ImageService extends AbstractImageService
 
             $assetResponse->setStatus(false);
             $assetResponse->setErrorMessage(sprintf('Error generating the image from the stream , ImageException: %s', $e->getMessage()));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->em->rollback();
             $this->logger->error(sprintf('Error saving the image, Exception: %s', $e->getMessage()));
 
@@ -183,7 +171,7 @@ class ImageService extends AbstractImageService
         return $assetResponse;
     }
 
-    public function createAsset($data, $entity)
+    public function createAsset(array $data, $entity): ?Asset
     {
         try {
             $imageOption = $this->getOption($this->getEntityCode($entity), $data['type']);
@@ -196,14 +184,14 @@ class ImageService extends AbstractImageService
             $this->em->flush($asset);
 
             return $asset;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating the asset, Exception: %s', $e->getMessage()));
         }
 
         return null;
     }
 
-    public function createRenditions(Asset $asset, $data, $entity, $aspectRatio)
+    public function createRenditions(Asset $asset, array $data, $entity, string $aspectRatio): void
     {
         try {
             $imageOption = $this->getOption($this->getEntityCode($entity), $data['type']);
@@ -217,29 +205,24 @@ class ImageService extends AbstractImageService
             foreach ($imageOption->getFinalRenditions($aspectRatio) as $rendition) {
                 $this->saveRendition($asset, $rendition, $imageOption->getQuality(), $aspectRatio);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf('Error saving the asset stream, Exception: %s', $e->getMessage()));
 
             throw $e;
         }
     }
 
-    /**
-     * @param $entity
-     * @return array
-     *
-     * Returns an array with the profiles defined for the entity
-     */
-    public function getProfiles($entity)
+    public function getProfiles($entity): array
     {
         $entity = $this->getEntityCode($entity);
         if (isset($this->imageOptions['entities'][$entity])) {
             return $this->imageOptions['entities'][$entity];
         }
+
         return [];
     }
 
-    protected function saveOriginal(Asset $asset, $stream, $aspectRatio)
+    protected function saveOriginal(Asset $asset, string $stream, string $aspectRatio): void
     {
         $directory = $this->createDirectory($asset);
 
@@ -247,11 +230,11 @@ class ImageService extends AbstractImageService
         file_put_contents($fileName, $stream);
 
         if (! file_exists($fileName)) {
-            throw new Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
+            throw new \Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
         }
     }
 
-    protected function saveRendition(Asset $asset, $rendition, $quality, $aspectRatio)
+    protected function saveRendition(Asset $asset, string $rendition, int $quality, string $aspectRatio): void
     {
         $directory = $this->assetsDirectory . '/' . $this->getBaseDirectory($asset);
 
@@ -260,21 +243,21 @@ class ImageService extends AbstractImageService
 
         try {
             $image = $this->getImageManager()->make($originalFileName)->fit($rendition['w'], $rendition['h']);
-            
+
             $image->interlace(false);
             $image->save($renditionFileName, $quality);
         } catch (NotReadableException $e) {
             $this->logger->error(sprintf('Catch NotReadableException saving rendition %s using original %s', $renditionFileName, $originalFileName));
 
             throw $e;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf('Catch Generic Exception saving rendition %s using original %s', $renditionFileName, $originalFileName));
 
             throw $e;
         }
     }
 
-    protected function createDirectory(Asset $asset)
+    protected function createDirectory(Asset $asset): string
     {
         $directory = $this->assetsDirectory . '/' . $this->getBaseDirectory($asset);
 

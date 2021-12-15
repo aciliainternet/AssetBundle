@@ -1,22 +1,29 @@
 {
     "name": "aciliainternet/asset-bundle",
-    "type": "bundle",
     "description": "Acilia Asset Bundle",
+    "type": "bundle",
+    "license": "proprietary",
     "keywords": ["bundle"],
     "homepage": "https://github.com/aciliainternet/AssetBundle",
     "authors": [
         {
-            "name": "Acilia Internet",
-            "homepage": "http://acilia.es"
+            "name": "Acilia Software",
+            "homepage": "https://acilia.es"
         }
     ],
     "require": {
-        "php":                        ">=5.3.3",
-        "symfony/framework-bundle":   ">=2.7.0",
-        "intervention/image":         "^2.3"
+        "php": ">=7.2",
+        "symfony/framework-bundle": "^4.4",
+        "intervention/image": "^2.7"
     },
     "autoload": {
         "psr-0": { "Acilia\\Bundle\\AssetBundle": "" }
     },
-    "target-dir": "Acilia/Bundle/AssetBundle"
+    "target-dir": "Acilia/Bundle/AssetBundle",
+     "extra": {
+        "symfony": {
+            "require": "4.4.*",
+            "allow-contrib": true
+        }
+    }
 }

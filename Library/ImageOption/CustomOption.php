@@ -2,13 +2,11 @@
 
 namespace Acilia\Bundle\AssetBundle\Library\ImageOption;
 
-use Exception;
-
 class CustomOption extends AbstractOption
 {
-    protected $thumbWidth = 150;
+    protected int $thumbWidth = 150;
 
-    public function __construct($options, $entity, $type)
+    public function __construct(array $options, $entity, string $type)
     {
         parent::__construct($options, $entity, $type);
 
@@ -16,7 +14,7 @@ class CustomOption extends AbstractOption
 
         foreach ($mandatoryOptions as $option) {
             if (!isset($options[$option])) {
-                throw new Exception(sprintf('The option "%s" was not found.', $option));
+                throw new \Exception(sprintf('The option "%s" was not found.', $option));
             }
         }
 
@@ -38,7 +36,7 @@ class CustomOption extends AbstractOption
         }
     }
 
-    public function getSpecs()
+    public function getSpecs(): array
     {
         $specs['custom'] = [
             'aspectRatio' => false,
@@ -49,31 +47,35 @@ class CustomOption extends AbstractOption
         return $specs;
     }
 
-    public function getRendition($rendition)
+    public function getRendition(string $rendition): string
     {
         return 'custom';
     }
 
-    public function getFirstSize()
+    public function getFirstSize(): ?string
     {
         return 'original.custom';
     }
 
-    public function getAspectRatios($replace = 'x')
+    public function getAspectRatios(string $replace = 'x'): array
     {
         $aspectRatios = ['custom'];
 
         return $aspectRatios;
     }
 
-    public function getMinHeight($rendition)
+    public function getMinHeight(string $rendition): int
     {
         return $this->minHeights;
     }
 
-    public function getFinalRenditions($aspectRatio)
+    public function getFinalRenditions(string $aspectRatio): array
     {
-        $renditions[] = ['w' => $this->thumbWidth, 'h' => null, 'n' => 'thumb.custom'];
+        $renditions[] = [
+            'w' => $this->thumbWidth,
+            'h' => null,
+            'n' => 'thumb.custom'
+        ];
 
         return $renditions;
     }

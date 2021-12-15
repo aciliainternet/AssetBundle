@@ -15,72 +15,43 @@ class Asset
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=64, name="asset_type")
      */
-    protected $type;
+    protected string $type;
 
     /**
      * @ORM\Column(type="string", length=4, name="asset_extension")
      */
-    protected $extension;
+    protected string $extension;
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Set type.
-     *
-     * @param string $type
-     *
-     * @return Asset
-     */
-    public function setType($type)
+    public function setType(string $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * Get type.
-     *
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * Set extension.
-     *
-     * @param string $extension
-     *
-     * @return Asset
-     */
-    public function setExtension($extension)
+    public function setExtension(string $extension): self
     {
         $this->extension = $extension;
 
         return $this;
     }
 
-    /**
-     * Get extension.
-     *
-     * @return string
-     */
-    public function getExtension()
+    public function getExtension(): string
     {
         return $this->extension;
     }

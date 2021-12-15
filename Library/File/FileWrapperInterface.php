@@ -6,7 +6,7 @@ use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 
 interface FileWrapperInterface
 {
-    public function setAssetFile(AssetFile $assetFile);
+    public function setAssetFile(AssetFile $assetFile): void;
 
-    public function getAssetFile();
+    public function getAssetFile(): AssetFile;
 }

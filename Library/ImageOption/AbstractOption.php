@@ -4,22 +4,22 @@ namespace Acilia\Bundle\AssetBundle\Library\ImageOption;
 
 abstract class AbstractOption
 {
-    const DEFAULT_QUALITY = 80;
+    public const DEFAULT_QUALITY = 80;
 
-    protected $randomId;
+    protected string $randomId;
     protected $entity;
-    protected $type;
-    protected $title;
-    protected $attribute;
-    protected $aspectRatios = [];
-    protected $renditions = [];
-    protected $retina;
-    protected $quality;
-    protected $assetsPerDirectory;
-    protected $minWidths;
-    protected $minHeights;
+    protected string $type;
+    protected string $title;
+    protected string $attribute;
+    protected array $aspectRatios = [];
+    protected array $renditions = [];
+    protected bool $retina;
+    protected int $quality;
+    protected int $assetsPerDirectory;
+    protected int $minWidths;
+    protected int $minHeights;
 
-    public function __construct($options, $entity, $type)
+    public function __construct(array $options, $entity, string $type)
     {
         $this->randomId = 'cropper-'.md5(time().mt_rand());
         $this->entity = $entity;
@@ -32,33 +32,33 @@ abstract class AbstractOption
         $this->preserveOriginal = isset($options['preserveOriginal']) ? $options['preserveOriginal'] : false;
     }
 
-    abstract public function getRendition($rendition);
+    abstract public function getRendition(string $rendition): string;
 
-    abstract public function getFirstSize();
+    abstract public function getFirstSize(): ?string;
 
-    abstract public function getAspectRatios($replace = 'x');
+    abstract public function getAspectRatios(string $replace = 'x'): array;
 
-    abstract public function getSpecs();
+    abstract public function getSpecs(): array;
 
-    abstract public function getMinHeight($rendition);
+    abstract public function getMinHeight(string $rendition): int;
 
-    abstract public function getFinalRenditions($aspectRatio);
+    abstract public function getFinalRenditions(string $aspectRatio): array;
 
-    public function getSetter()
+    public function getSetter(): string
     {
         $method = 'set'.ucfirst($this->attribute);
 
         return $method;
     }
 
-    public function getGetter()
+    public function getGetter(): string
     {
         $method = 'get'.ucfirst($this->attribute);
 
         return $method;
     }
 
-    public function getQuality()
+    public function getQuality(): int
     {
         if (is_numeric($this->quality)) {
             return $this->quality;
@@ -67,26 +67,26 @@ abstract class AbstractOption
         return self::DEFAULT_QUALITY;
     }
 
-    public function getAssetsPerDirectory()
+    public function getAssetsPerDirectory(): ?int
     {
         if (is_numeric($this->assetsPerDirectory)) {
             return $this->assetsPerDirectory;
         }
 
-        return false;
+        return null;
     }
 
-    public function getAssetType()
+    public function getAssetType(): string
     {
         return $this->entity.'-'.$this->type;
     }
 
-    public function randomId()
+    public function randomId(): string
     {
         return $this->randomId;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -96,7 +96,7 @@ abstract class AbstractOption
         return $this->entity;
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }

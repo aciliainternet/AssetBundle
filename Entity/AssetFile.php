@@ -15,160 +15,93 @@ class AssetFile
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=64, name="file_type")
      */
-    protected $type;
+    protected string $type;
 
     /**
      * @ORM\Column(type="string", length=192, name="file_name", nullable=false)
      */
-    protected $name;
+    protected string $name;
 
     /**
      * @ORM\Column(type="string", length=4, name="file_extension", nullable=false)
      */
-    protected $extension;
+    protected string $extension;
 
     /**
      * @ORM\Column(type="string", length=32, name="file_mime_type", nullable=false)
      */
-    protected $mimeType;
+    protected string $mimeType;
 
     /**
      * @ORM\Column(type="integer", name="file_size", nullable=false)
      */
-    protected $size;
+    protected string $size;
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Set type.
-     *
-     * @param string $type
-     *
-     * @return AssetFile
-     */
-    public function setType($type)
+    public function setType(string $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * Get type.
-     *
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-
-    /**
-     * Set name.
-     *
-     * @param string $name
-     *
-     * @return AssetFile
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * Get name.
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * Set extension.
-     *
-     * @param string $extension
-     *
-     * @return AssetFile
-     */
-    public function setExtension($extension)
+    public function setExtension(string $extension): self
     {
         $this->extension = $extension;
 
         return $this;
     }
 
-    /**
-     * Get extension.
-     *
-     * @return string
-     */
-    public function getExtension()
+    public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * Set mimeType.
-     *
-     * @param string $mimeType
-     *
-     * @return AssetFile
-     */
-    public function setMimeType($mimeType)
+    public function setMimeType(string $mimeType): self
     {
         $this->mimeType = $mimeType;
 
         return $this;
     }
 
-    /**
-     * Get mimeType.
-     *
-     * @return string
-     */
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return $this->mimeType;
     }
 
-    /**
-     * Set size.
-     *
-     * @param integer $size
-     *
-     * @return AssetFile
-     */
-    public function setSize($size)
+    public function setSize(int $size): self
     {
         $this->size = $size;
 
         return $this;
     }
-
-    /**
-     * Get size.
-     *
-     * @return integer
-     */
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
     }

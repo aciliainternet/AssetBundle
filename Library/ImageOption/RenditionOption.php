@@ -6,7 +6,7 @@ use Exception;
 
 class RenditionOption extends AbstractOption
 {
-    public function __construct($options, $entity, $type, $ratios, $renditions)
+    public function __construct(array $options, $entity, string $type, $ratios, $renditions)
     {
         parent::__construct($options, $entity, $type);
 
@@ -56,7 +56,7 @@ class RenditionOption extends AbstractOption
         return $imageRenditions;
     }
 
-    protected function calculateAspectRatios($ratios)
+    protected function calculateAspectRatios(array $ratios): array
     {
         $aspectRatios = [];
 
@@ -74,12 +74,12 @@ class RenditionOption extends AbstractOption
         return $aspectRatios;
     }
 
-    public function getRenditions()
+    public function getRenditions(): array
     {
         return $this->renditions;
     }
 
-    public function getRendition($rendition)
+    public function getRendition(string $rendition): string
     {
         if (isset($this->renditions[$rendition])) {
             return $this->renditions[$rendition];
@@ -88,16 +88,18 @@ class RenditionOption extends AbstractOption
         throw new Exception(sprintf('The rendition "%s" is not assigned for the entity "%s".', $rendition, $this->entity));
     }
 
-    public function getFirstSize()
+    public function getFirstSize(): ?string
     {
         foreach ($this->renditions as $sizes) {
             foreach ($sizes as $size) {
                 return $size;
             }
         }
+
+        return null;
     }
 
-    public function getAspectRatios($replace = 'x')
+    public function getAspectRatios(string $replace = 'x'): array
     {
         $aspectRatios = [];
 
@@ -108,7 +110,7 @@ class RenditionOption extends AbstractOption
         return $aspectRatios;
     }
 
-    public function getSpecs()
+    public function getSpecs(): array
     {
         $specs = [];
 
@@ -123,7 +125,7 @@ class RenditionOption extends AbstractOption
         return $specs;
     }
 
-    public function getMinHeight($rendition)
+    public function getMinHeight(string $rendition): int
     {
         if ($this->retina) {
             return $this->minHeights[$rendition] * 2;
@@ -132,7 +134,7 @@ class RenditionOption extends AbstractOption
         return $this->minHeights[$rendition];
     }
 
-    public function getFinalRenditions($aspectRatio)
+    public function getFinalRenditions(string $aspectRatio): array
     {
         $sizes = array_unique($this->aspectRatios[$aspectRatio]);
         $renditions = [];

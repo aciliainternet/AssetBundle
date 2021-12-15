@@ -6,19 +6,19 @@ use Acilia\Bundle\AssetBundle\Library\Exception\ImageException;
 
 class ImageStream
 {
-    const TYPE_JPG = 'jpg';
-    const TYPE_PNG = 'png';
+    public const TYPE_JPG = 'jpg';
+    public const TYPE_PNG = 'png';
 
-    protected $type;
-    protected $content;
+    protected string $type;
+    protected string $content;
 
-    public function __construct($type, $content)
+    public function __construct(string $type, string $content)
     {
         $this->type = $type;
         $this->content = $content;
     }
 
-    public static function getInstanceFromStream($stream)
+    public static function getInstanceFromStream(string $stream): self
     {
         if (strpos($stream, 'data:image/png;base64,') === 0) {
             $stream = base64_decode(substr($stream, 22));
@@ -37,12 +37,12 @@ class ImageStream
         throw new ImageException('Invalid stream');
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
