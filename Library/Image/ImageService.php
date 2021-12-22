@@ -9,7 +9,7 @@ use Acilia\Bundle\AssetBundle\Entity\Asset;
 
 abstract class ImageService
 {
-    protected array $imageOptions;
+    protected $imageOptions;
 
     public function __construct(array $imageOptions)
     {

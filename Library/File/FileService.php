@@ -6,7 +6,7 @@ use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 
 abstract class FileService
 {
-    protected array $fileOptions;
+    protected $fileOptions;
 
     public function __construct(array $fileOptions)
     {

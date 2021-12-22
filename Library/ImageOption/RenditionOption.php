@@ -2,8 +2,6 @@
 
 namespace Acilia\Bundle\AssetBundle\Library\ImageOption;
 
-use Exception;
-
 class RenditionOption extends AbstractOption
 {
     public function __construct(array $options, $entity, string $type, $ratios, $renditions)
@@ -14,7 +12,7 @@ class RenditionOption extends AbstractOption
 
         foreach ($mandatoryOptions as $option) {
             if (!isset($options[$option])) {
-                throw new Exception(sprintf('The option "%s" was not found.', $option));
+                throw new \Exception(sprintf('The option "%s" was not found.', $option));
             }
         }
 
@@ -85,7 +83,11 @@ class RenditionOption extends AbstractOption
             return $this->renditions[$rendition];
         }
 
-        throw new Exception(sprintf('The rendition "%s" is not assigned for the entity "%s".', $rendition, $this->entity));
+        throw new \Exception(sprintf(
+            'The rendition "%s" is not assigned for the entity "%s".',
+            $rendition,
+            $this->entity
+        ));
     }
 
     public function getFirstSize(): ?string

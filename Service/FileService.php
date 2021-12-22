@@ -15,13 +15,13 @@ use Psr\Log\LoggerInterface;
 
 class FileService extends AbstractFileService
 {
-    protected EntityManager $em;
-    protected LoggerInterface $logger;
-    protected ParameterBagInterface $params;
-    protected array $fileOptions;
-    protected string $fileDirectory;
-    protected string $filePublic;
-    protected string $fileDomain;
+    protected $em;
+    protected $logger;
+    protected $params;
+    protected $fileOptions;
+    protected $fileDirectory;
+    protected $filePublic;
+    protected $fileDomain;
 
     public function __construct(
         EntityManager $entityManager,

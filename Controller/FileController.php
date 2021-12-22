@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends AbstractController
 {
+    protected $service;
+    
     public function __construct(FileService $service)
     {
         $this->service = $service;

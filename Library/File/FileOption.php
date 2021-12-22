@@ -9,12 +9,12 @@ class FileOption
 {
     protected $entity;
 
-    protected string $randomId;
-    protected string $type;
-    protected string $title;
-    protected string $attribute;
-    protected array $restrictions;
-    protected bool $wrapper;
+    protected $randomId;
+    protected $type;
+    protected $title;
+    protected $attribute;
+    protected $restrictions;
+    protected $wrapper;
 
     public function __construct(array $options, $entity, string $type)
     {

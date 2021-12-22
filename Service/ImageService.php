@@ -17,14 +17,14 @@ use Psr\Log\LoggerInterface;
 
 class ImageService extends AbstractImageService
 {
-    protected EntityManager $em;
-    protected LoggerInterface $logger;
-    protected ParameterBagInterface $params;
-    protected array $imageOptions;
-    protected string $assetsDirectory;
-    protected string $assetsPublic;
-    protected string $assetDomain;
-    protected ?ImageManager $imageManager = null;
+    protected $em;
+    protected $logger;
+    protected $params;
+    protected $imageOptions;
+    protected $assetsDirectory;
+    protected $assetsPublic;
+    protected $assetDomain;
+    protected $imageManager = null;
     protected $error;
 
     public function __construct(

@@ -17,13 +17,14 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('acilia_asset');
+        $treeBuilder = new TreeBuilder('acilia_asset');
+
+        $root = $treeBuilder->getRootNode();
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
-        $rootNode
+        $root
             ->children()
                 ->scalarNode('assets_images')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('assets_dir')->isRequired()->cannotBeEmpty()->end()

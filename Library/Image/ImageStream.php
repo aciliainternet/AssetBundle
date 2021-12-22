@@ -9,8 +9,8 @@ class ImageStream
     public const TYPE_JPG = 'jpg';
     public const TYPE_PNG = 'png';
 
-    protected string $type;
-    protected string $content;
+    protected $type;
+    protected $content;
 
     public function __construct(string $type, string $content)
     {

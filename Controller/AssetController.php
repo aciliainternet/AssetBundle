@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends AbstractController
 {
+    protected $service;
+    
     public function __construct(ImageService $service)
     {
         $this->service = $service;

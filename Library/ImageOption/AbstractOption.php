@@ -6,18 +6,18 @@ abstract class AbstractOption
 {
     public const DEFAULT_QUALITY = 80;
 
-    protected string $randomId;
+    protected $randomId;
     protected $entity;
-    protected string $type;
-    protected string $title;
-    protected string $attribute;
-    protected array $aspectRatios = [];
-    protected array $renditions = [];
-    protected bool $retina;
-    protected int $quality;
-    protected int $assetsPerDirectory;
-    protected int $minWidths;
-    protected int $minHeights;
+    protected $type;
+    protected $title;
+    protected $attribute;
+    protected $aspectRatios = [];
+    protected $renditions = [];
+    protected $retina;
+    protected $quality;
+    protected $assetsPerDirectory;
+    protected $minWidths;
+    protected $minHeights;
 
     public function __construct(array $options, $entity, string $type)
     {

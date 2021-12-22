@@ -15,32 +15,32 @@ class AssetFile
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected int $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=64, name="file_type")
      */
-    protected string $type;
+    protected $type;
 
     /**
      * @ORM\Column(type="string", length=192, name="file_name", nullable=false)
      */
-    protected string $name;
+    protected $name;
 
     /**
      * @ORM\Column(type="string", length=4, name="file_extension", nullable=false)
      */
-    protected string $extension;
+    protected $extension;
 
     /**
      * @ORM\Column(type="string", length=32, name="file_mime_type", nullable=false)
      */
-    protected string $mimeType;
+    protected $mimeType;
 
     /**
      * @ORM\Column(type="integer", name="file_size", nullable=false)
      */
-    protected string $size;
+    protected $size;
 
     public function getId(): int
     {

@@ -4,7 +4,7 @@ namespace Acilia\Bundle\AssetBundle\Library\ImageOption;
 
 class CustomOption extends AbstractOption
 {
-    protected int $thumbWidth = 150;
+    protected $thumbWidth = 150;
 
     public function __construct(array $options, $entity, string $type)
     {

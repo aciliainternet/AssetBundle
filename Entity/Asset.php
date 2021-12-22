@@ -15,17 +15,17 @@ class Asset
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected int $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=64, name="asset_type")
      */
-    protected string $type;
+    protected $type;
 
     /**
      * @ORM\Column(type="string", length=4, name="asset_extension")
      */
-    protected string $extension;
+    protected $extension;
 
     public function getId(): int
     {
