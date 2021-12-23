@@ -33,7 +33,7 @@ abstract class AbstractOption
         $this->preserveOriginal = isset($options['preserveOriginal']) ? $options['preserveOriginal'] : false;
     }
 
-    abstract public function getRendition(string $rendition): string;
+    abstract public function getRendition(string $rendition): array;
 
     abstract public function getFirstSize(): ?string;
 

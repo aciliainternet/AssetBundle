@@ -47,9 +47,9 @@ class CustomOption extends AbstractOption
         return $specs;
     }
 
-    public function getRendition(string $rendition): string
+    public function getRendition(string $rendition): array
     {
-        return 'custom';
+        return ['custom'];
     }
 
     public function getFirstSize(): ?string
