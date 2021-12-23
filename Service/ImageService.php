@@ -8,7 +8,7 @@ use Acilia\Bundle\AssetBundle\Library\Image\ImageStream;
 use Acilia\Bundle\AssetBundle\Entity\Asset;
 use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 use Acilia\Bundle\AssetBundle\Library\AssetResponse;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Exception\NotReadableException;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +19,6 @@ class ImageService extends AbstractImageService
 {
     protected $em;
     protected $logger;
-    protected $params;
     protected $imageOptions;
     protected $assetsDirectory;
     protected $assetsPublic;
@@ -28,17 +27,16 @@ class ImageService extends AbstractImageService
     protected $error;
 
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         ParameterBagInterface $params
     ) {
         $this->em = $entityManager;
         $this->logger = $logger;
-        $this->params = $params;
-        $this->imageOptions = $this->params->get('acilia_asset.assets_images');
-        $this->assetsDirectory = $this->params->get('acilia_asset.assets_dir');
-        $this->assetsPublic = $this->params->get('acilia_asset.assets_public');
-        $this->assetDomain = $this->params->get('acilia_asset.assets_domain');
+        $this->imageOptions = $params->get('acilia_asset.assets_images');
+        $this->assetsDirectory = $params->get('acilia_asset.assets_dir');
+        $this->assetsPublic = $params->get('acilia_asset.assets_public');
+        $this->assetDomain = $params->get('acilia_asset.assets_domain');
     }
 
     protected function getImageManager(): ImageManager

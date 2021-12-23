@@ -7,7 +7,7 @@ use Acilia\Bundle\AssetBundle\Library\Exception\FileException;
 use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 use Acilia\Bundle\AssetBundle\Library\AssetResponse;
 use Acilia\Bundle\AssetBundle\Library\File\FileWrapperInterface;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -17,24 +17,22 @@ class FileService extends AbstractFileService
 {
     protected $em;
     protected $logger;
-    protected $params;
     protected $fileOptions;
     protected $fileDirectory;
     protected $filePublic;
     protected $fileDomain;
 
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         LoggerInterface $logger,
-        ParameterBagInterface $params,
+        ParameterBagInterface $params
     ) {
         $this->em = $entityManager;
         $this->logger = $logger;
-        $this->params = $params;
-        $this->fileOptions = $this->params->get('acilia_asset.assets_files');
-        $this->fileDirectory = $this->params->get('acilia_asset.assets_files_dir');
-        $this->filePublic = $this->params->get('acilia_asset.assets_files_public');
-        $this->fileDomain = $this->params->get('acilia_asset.assets_files_domain');
+        $this->fileOptions = $params->get('acilia_asset.assets_files');
+        $this->fileDirectory = $params->get('acilia_asset.assets_files_dir');
+        $this->filePublic = $params->get('acilia_asset.assets_files_public');
+        $this->fileDomain = $params->get('acilia_asset.assets_files_domain');
     }
 
     public function getAssetFromEntity($entity, string $type): ?AssetFile

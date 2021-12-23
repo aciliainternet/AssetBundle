@@ -1,5 +1,14 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
 
+    Acilia\Bundle\AssetBundle\Service\ImageService:
+        public: true
+
+    Acilia\Bundle\AssetBundle\Service\FileService:
+        public: true
     # Image service
     #acilia.asset.service.image:
     #    class: Acilia\Bundle\AssetBundle\Service\ImageService
