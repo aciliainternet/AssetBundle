@@ -16,6 +16,7 @@ abstract class AbstractOption
     protected $retina;
     protected $quality;
     protected $assetsPerDirectory;
+    protected $preserveOriginal;
     protected $minWidths;
     protected $minHeights;
 
@@ -28,7 +29,7 @@ abstract class AbstractOption
         $this->attribute = $options['attribute'];
         $this->retina = isset($options['retina']) ? $options['retina'] : false;
         $this->quality = isset($options['quality']) ? $options['quality'] : self::DEFAULT_QUALITY;
-        $this->assetsPerDirectory = isset($options['assetsPerDirectory']) ? $options['assetsPerDirectory'] : false;
+        $this->assetsPerDirectory = isset($options['assetsPerDirectory']) ? (int) $options['assetsPerDirectory'] : null;
         $this->preserveOriginal = isset($options['preserveOriginal']) ? $options['preserveOriginal'] : false;
     }
 
@@ -69,11 +70,12 @@ abstract class AbstractOption
 
     public function getAssetsPerDirectory(): ?int
     {
-        if (is_numeric($this->assetsPerDirectory)) {
-            return $this->assetsPerDirectory;
-        }
+        return $this->assetsPerDirectory;
+    }
 
-        return null;
+    public function getPreserveOriginal(): bool
+    {
+        return $this->preserveOriginal;
     }
 
     public function getAssetType(): string

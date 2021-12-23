@@ -58,7 +58,7 @@ abstract class ImageService
         $options = $this->getOption($asset, $asset->getType());
 
         $directory = $asset->getType();
-        if ($options->getAssetsPerDirectory() !== false) {
+        if ($options->getAssetsPerDirectory() !== null) {
             $subDirectory = floor($asset->getId() / $options->getAssetsPerDirectory());
             $directory .= '/' . $subDirectory;
         }
