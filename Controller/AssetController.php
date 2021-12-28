@@ -21,15 +21,16 @@ class AssetController extends AbstractController
         return $this->service;
     }
 
-    public function form(object $entity, ?string $type): Response
+    public function form($entity, ?string $type): Response
     {
         $imageService = $this->getService();
+
         $imageOption = $imageService->getOption($entity, $type);
         $asset = $imageService->getAssetFromEntity($entity, $type);
 
         $assetUrl = ($asset instanceof Asset) ? $imageService->getUrl($asset) : null;
 
-        return $this->render('AciliaAssetBundle:Asset:asset.html.twig', [
+        return $this->render('@AciliaAsset/asset/form.html.twig', [
             'asset' => $asset,
             'assetUrl' => $assetUrl,
             'imageOption' => $imageOption,

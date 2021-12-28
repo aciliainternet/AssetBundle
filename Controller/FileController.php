@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class FileController extends AbstractController
 {
     protected $service;
-    
+
     public function __construct(FileService $service)
     {
         $this->service = $service;
@@ -21,7 +21,7 @@ class FileController extends AbstractController
         return $this->service;
     }
 
-    public function form(AssetFile $entity, ?string $type): Response
+    public function form($entity, ?string $type): Response
     {
         $fileService = $this->getService();
 
@@ -30,7 +30,7 @@ class FileController extends AbstractController
 
         $assetUrl = ($asset instanceof AssetFile) ? $fileService->getUrl($asset) : null;
 
-        return $this->render('AciliaAssetBundle:File:form.html.twig', [
+        return $this->render('@AciliaAsset/asset_file/form.html.twig', [
             'asset' => $asset,
             'assetUrl' => $assetUrl,
             'fileOption' => $fileOption,

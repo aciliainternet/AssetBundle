@@ -47,7 +47,7 @@ class ImageService extends AbstractImageService
         return $this->imageManager;
     }
 
-    public function getAssetFromEntity(object $entity, string $type): ?Asset
+    public function getAssetFromEntity($entity, string $type): ?Asset
     {
         $asset = null;
         if (is_object($entity)) {
