@@ -6,7 +6,6 @@ use Acilia\Bundle\AssetBundle\Library\Image\ImageService as AbstractImageService
 use Acilia\Bundle\AssetBundle\Library\Exception\ImageException;
 use Acilia\Bundle\AssetBundle\Library\Image\ImageStream;
 use Acilia\Bundle\AssetBundle\Entity\Asset;
-use Acilia\Bundle\AssetBundle\Entity\AssetFile;
 use Acilia\Bundle\AssetBundle\Library\AssetResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Intervention\Image\ImageManager;
@@ -48,7 +47,7 @@ class ImageService extends AbstractImageService
         return $this->imageManager;
     }
 
-    public function getAssetFromEntity($entity, string $type): ?AssetFile
+    public function getAssetFromEntity($entity, string $type): ?Asset
     {
         $asset = null;
         if (is_object($entity)) {
