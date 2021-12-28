@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AssetController extends AbstractController
 {
     protected $service;
-    
+
     public function __construct(ImageService $service)
     {
         $this->service = $service;
@@ -21,7 +21,7 @@ class AssetController extends AbstractController
         return $this->service;
     }
 
-    public function form(Asset $entity, ?string $type): Response
+    public function form(object $entity, ?string $type): Response
     {
         $imageService = $this->getService();
         $imageOption = $imageService->getOption($entity, $type);

@@ -77,7 +77,7 @@ class RenditionOption extends AbstractOption
         return $this->renditions;
     }
 
-    public function getRendition(string $rendition): array
+    public function getRendition(?string $rendition): array
     {
         if (isset($this->renditions[$rendition])) {
             return $this->renditions[$rendition];

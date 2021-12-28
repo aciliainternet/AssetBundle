@@ -4,6 +4,11 @@ services:
         autoconfigure: true
         public: false
 
+    Acilia\Bundle\AssetBundle\Controller\:
+        resource: '../../Controller/*'
+        tags: ['controller.service_arguments']
+
+
     Acilia\Bundle\AssetBundle\Service\ImageService:
         public: true
 
