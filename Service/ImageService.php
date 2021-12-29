@@ -231,7 +231,7 @@ class ImageService extends AbstractImageService
         }
     }
 
-    protected function saveRendition(Asset $asset, string $rendition, int $quality, string $aspectRatio): void
+    protected function saveRendition(Asset $asset, array $rendition, int $quality, string $aspectRatio): void
     {
         $directory = $this->assetsDirectory . '/' . $this->getBaseDirectory($asset);
 
