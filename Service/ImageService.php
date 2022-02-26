@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Exception\NotReadableException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Aws\S3\S3Client;
 use Psr\Log\LoggerInterface;
 use ReflectionMethod;
 use Exception;
@@ -26,6 +26,8 @@ class ImageService extends AbstractImageService
     protected $assetDomain;
     protected $imageManager;
     protected $error;
+    protected $s3Client = null;
+    protected $s3Bucket = null;
 
     public function __construct(EntityManager $entityManager, LoggerInterface $logger, $imageOptions, $assetsDirectory, $assetsPublic, $assetDomain)
     {
@@ -35,6 +37,14 @@ class ImageService extends AbstractImageService
         $this->assetsDirectory = $assetsDirectory;
         $this->assetsPublic = $assetsPublic;
         $this->assetDomain = $assetDomain;
+
+        if (getenv('ACILIA_ASSET_BUNDLE_MEDIA_BUCKET')) {
+            $this->s3Client = new S3Client([
+                'region' => getenv('AWS_REGION'),
+                'version' => '2006-03-01',
+            ]);
+            $this->s3Bucket = getenv('ACILIA_ASSET_BUNDLE_MEDIA_BUCKET');
+        }
     }
 
     /**
@@ -78,7 +88,7 @@ class ImageService extends AbstractImageService
         try {
             $imageOption = $this->getOption($asset);
             $sizes = $imageOption->getRendition($rendition);
-            
+
             if (is_array($sizes)) {
                 $size = isset($sizes[$size]) ? $sizes[$size] : $size;
             } else {
@@ -91,14 +101,33 @@ class ImageService extends AbstractImageService
         $filename = $this->getAssetFilename($asset, $size);
         $url = '/' . trim($this->assetsPublic, '/') . '/' . $filename;
 
+        if ($this->s3Client !== null) {
+            $url = $this->getUrlFromS3($filename);
+        }
+
         return $url;
+    }
+
+    public function getUrlFromS3($filename)
+    {
+        if ($this->s3Client !== null) {
+            $cmd = $this->s3Client->getCommand('GetObject', [
+                'Bucket' => $this->s3Bucket,
+                'Key' => $filename
+            ]);
+            $request = $this->s3Client->createPresignedRequest($cmd, '+24 hours');
+
+            return (string) $request->getUri();
+        }
+
+        throw new Exception('Requested S3 File, but no bucket defined');
     }
 
     public function handleRequest(Request $request, $entity)
     {
         // create the response object
         $assetResponse = new AssetResponse();
-        if (! $request->request->has('asset')) {
+        if (!$request->request->has('asset')) {
             $assetResponse->setStatus(true);
 
             return $assetResponse;
@@ -136,7 +165,7 @@ class ImageService extends AbstractImageService
                         if (!$asset instanceof Asset) {
                             $asset = new Asset();
                             $asset->setType($imageOption->getAssetType())
-                                ->setExtension($imageStream->getType());
+                                ->setExtension(strtolower($imageStream->getType()));
                             $this->em->persist($asset);
                             $this->em->flush($asset);
                         }
@@ -190,7 +219,7 @@ class ImageService extends AbstractImageService
 
             $asset = new Asset();
             $asset->setType($imageOption->getAssetType())
-                ->setExtension($data['extension']);
+                ->setExtension(strtolower($data['extension']));
 
             $this->em->persist($asset);
             $this->em->flush($asset);
@@ -241,18 +270,27 @@ class ImageService extends AbstractImageService
 
     protected function saveOriginal(Asset $asset, $stream, $aspectRatio)
     {
-        $directory = $this->createDirectory($asset);
+        if ($this->s3Client !== null) {
+            $fileName = sprintf('%s/%u.original.%s.%s', $this->getBaseDirectory($asset), $asset->getId(), $aspectRatio, $asset->getExtension());
+            $this->saveToS3($fileName, $stream, $this->getContentType($asset->getExtension()));
+        } else {
+            $directory = $this->createDirectory($asset);
 
-        $fileName = sprintf('%s/%u.original.%s.%s', $directory, $asset->getId(), $aspectRatio, $asset->getExtension());
-        file_put_contents($fileName, $stream);
+            $fileName = sprintf('%s/%u.original.%s.%s', $directory, $asset->getId(), $aspectRatio, $asset->getExtension());
+            file_put_contents($fileName, $stream);
 
-        if (! file_exists($fileName)) {
-            throw new Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
+            if (!file_exists($fileName)) {
+                throw new Exception(sprintf('Original file for asset cannot be saved (%s)', $fileName));
+            }
         }
     }
 
     protected function saveRendition(Asset $asset, $rendition, $quality, $aspectRatio)
     {
+        if ($this->s3Client !== null) {
+            return $this->saveRenditionToS3($asset, $rendition, $quality, $aspectRatio);
+        }
+
         $directory = $this->assetsDirectory . '/' . $this->getBaseDirectory($asset);
 
         $originalFileName = sprintf('%s/%u.original.%s.%s', $directory, $asset->getId(), $aspectRatio, $asset->getExtension());
@@ -260,7 +298,7 @@ class ImageService extends AbstractImageService
 
         try {
             $image = $this->getImageManager()->make($originalFileName)->fit($rendition['w'], $rendition['h']);
-            
+
             $image->interlace(false);
             $image->save($renditionFileName, $quality);
         } catch (NotReadableException $e) {
@@ -271,6 +309,73 @@ class ImageService extends AbstractImageService
             $this->logger->error(sprintf('Catch Generic Exception saving rendition %s using original %s', $renditionFileName, $originalFileName));
 
             throw $e;
+        }
+    }
+
+    protected function saveRenditionToS3(Asset $asset, $rendition, $quality, $aspectRatio)
+    {
+        $directory = $this->getBaseDirectory($asset);
+        $originalFileName = sprintf('%s/%u.original.%s.%s', $directory, $asset->getId(), $aspectRatio, $asset->getExtension());
+        $object = $this->s3Client->getObject([
+            'Bucket' => $this->s3Bucket,
+            'Key' => $originalFileName
+        ]);
+        $tmpFile = tempnam('/tmp', 's3');
+        file_put_contents($tmpFile, $object->get('Body'));
+
+        if (!isset($rendition['w']) || $rendition['w'] === null) {
+            list($rendition['w'], $rendition['h']) = getimagesize($tmpFile);
+            if ($rendition['n'] === 'free') {
+                $rendition['n'] = sprintf('original.%s', $rendition['n']);
+            }
+        }
+
+        $renditionFileName = sprintf('%s/%u.%s.%s', $directory, $asset->getId(), $rendition['n'], $asset->getExtension());
+
+        try {
+            $image = $this->getImageManager()->make($tmpFile)->resize($rendition['w'], $rendition['h']);
+            $image->interlace(false);
+            $renditionContent = $image->encode($asset->getExtension(), $quality);
+            $this->saveToS3($renditionFileName, $renditionContent, $this->getContentType($asset->getExtension()));
+            unlink($tmpFile);
+        } catch (NotReadableException $e) {
+            $this->logger->error(sprintf('Catch NotReadableException saving rendition %s using original %s', $renditionFileName, $originalFileName));
+            throw $e;
+        } catch (Exception $e) {
+            $this->logger->error(sprintf('Catch Generic Exception saving rendition %s using original %s', $renditionFileName, $originalFileName));
+            throw $e;
+        }
+    }
+
+    protected function saveToS3($key, $body, $contentType)
+    {
+        $this->s3Client->upload(
+            $this->s3Bucket,
+            $key,
+            $body,
+            'private',
+            ['params' => ['ContentType' => $contentType]]
+        );
+    }
+
+    protected function getContentType($extension)
+    {
+        switch (strtolower($extension)) {
+            case 'png':
+                return 'image/png';
+                break;
+            case 'gif':
+                return 'image/gif';
+                break;
+            case 'webp':
+                return 'image/webp';
+                break;
+            case 'jp2':
+                return 'image/jp2';
+                break;
+            default:
+                return 'image/jpeg';
+                break;
         }
     }
 
